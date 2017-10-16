@@ -1,0 +1,713 @@
+<html>
+
+<!-- TODO -->
+<!-- - [ ] Remove unused characters inside the Montserrat fonts for smaller WOFF/WOFF2 file sizes -->
+<!-- - [ ] PNG 8-bit compress any PNG images. Minify any other JPG images. Also run .SVG images through minifier -->
+
+
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" >
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>DutchX</title>
+<meta property="og:type" content="website" />
+<meta property="og:title" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta property="og:site_name" content="" >
+<meta property="og:image" content="" />
+<meta property="og:image:secure_url" content="" />
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta property="revised" content="" />
+
+<!-- Favicon -->
+<link rel="shortcut icon" href="favicon.ico">
+
+<!-- Apple Icon Set -->
+<link rel="apple-touch-icon" href="">
+<link rel="apple-touch-icon" sizes="152x152" href="">
+<link rel="apple-touch-icon" sizes="180x180" href="">
+<link rel="icon" sizes="192x192" href="">
+
+<link href="/css/global.css" rel="stylesheet" type="text/css" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+  <div id="DEMO-ONLY">
+    <style>
+      #DEMO-ONLY {
+    width: 290px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: #333;
+    padding: 10px 10px;
+    box-sizing: border-box;
+    display: table;
+    z-index: 999999999999;
+    text-align: center;
+      }
+
+      #DEMO-ONLY > button {
+        background: white;
+        border: 0;
+        border-radius: 3px;
+        padding: 4px 8px;
+        text-transform: uppercase;
+        font-size: 10px;
+        font-family: inherit;
+        outline: 0;
+        margin-right: 8px;
+        cursor:  pointer;
+      }
+
+      #DEMO-ONLY > small {
+        display:  block;
+        color:  white;
+        text-transform:  uppercase;
+        padding: 0 0 5px;
+        letter-spacing: 10px;
+      }
+    </style>
+    <small>DEMO Panel</small>
+    <button onclick="demoPage('.home')">Home</button>
+    <button onclick="demoPage('[data-screen=amount]')">Panel 2</button>
+    <button onclick="demoPage('[data-screen=details]')">Panel 3</button>
+    <button onclick="demoPage('[data-screen=status]')">Panel 4</button>
+  </div>
+
+<header>
+  <div>
+    <a href="#" title="DutchX - Dutch Auction Exchange" class="logo"></a>
+
+    <i class="menuWallet">
+
+      <span>
+        <code>0xd79Ed64B47...</code>
+        <small>0.1983 ETH</small>
+      </span>
+
+      <div>
+        <table>
+          <tr>
+            <th>Token</th>
+            <th>Balance</th>
+          </tr>
+          <tr>
+            <td>ETH</td>
+            <td>0.340599</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+          <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                 <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                           <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                           <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                           <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+                           <tr>
+            <td>GNO</td>
+            <td>14.00349</td>
+          </tr>
+
+        </table>
+      </div>
+    </i>
+
+    <!-- Michel: If no unclaimed tokens we can remove the whole data attribute `data-unclaimed`. -->
+    <i class="menuAuctions" data-unclaimed="true"><img src="/images/auction.svg">
+      <strong>Your Auctions</strong>
+      <div>
+        <table>
+          <tr>
+            <th>Auction</th>
+            <th>Comitted</th>
+            <th>Claim Token</th>
+          </tr>
+          <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td><img src="images/claim.svg"></td>
+          </tr>
+          <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td><img src="images/claim.svg"></td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+                    <tr>
+            <td>ETH/GNO</td>
+            <td>134.034 GNO</td>
+            <td>-</td>
+          </tr>
+        </table>
+      </div>
+    </i>
+
+    <button class="hamburger" onclick="toggleMenu()"></button>
+    <!-- Main menu -->
+    <nav>
+      <button class="buttonExit" onclick="toggleMenu()"></button>
+      <a href="#">How it works</a>
+      <a href="#">About</a>
+      <a href="#">Faq</a>
+    </nav>
+  </div>
+</header>
+
+
+<section class="home">
+
+  <!-- Homepage: Left text content -->
+  <div class="intro">
+    <h1>Decentralised Token Auction Exchange.</h1>
+    <p>
+      DutchX is a token auction which uses a mechanism for determining a fair value for tokens. This value is based on the demand from the community.
+      <br><br>
+      No account needed. Direct trades between peers through smart contracts.
+      <br><br>
+      <a href="#">How a Dutch Auction works</a>
+    </p>
+  </div>
+  <!-- end -->
+
+
+<!-- Homepage: Token Picker module -->
+<div class="tokenPicker">
+
+  <!--
+  Token List Overlay
+  The class '.hide' is used here to hide the overlay. Can ommit if a React method is used.
+  IMPORTANT! -> For Tablet and mobile we need to toggle the class `.noScroll` when the tokenOverlay is visible.
+  Tablet is 1024px max. so that needs to happen for all resolutions 1024px and lower: window.matchMedia( "(max-width: 1024px)" )
+  -->
+  <div class="tokenOverlay hide">
+
+    <span class="tokenOverlayHeader">
+      <input class="tokenSearch" type="text" name="tokenSearch" placeholder="Find token by name or code">
+      <button class="buttonExit" onclick="modalExit('tokenOverlay')"></button>
+    </span>
+
+    <ul>
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="ETH"></i>
+       <big>ETHER</big><abbr>ETH</abbr>
+       <small>BALANCE:</small>
+       <!-- Add class `.noBalance` when the balance === 0 -->
+       <p class="noBalance">0 ETH</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="GNO"></i>
+       <big>GNOSIS</big><abbr>GNO</abbr>
+       <small>BALANCE:</small>
+       <p>5.34939 GNO</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="REP"></i>
+       <big>Augur</big><abbr>REP</abbr>
+       <small>BALANCE:</small>
+       <p>0 REP</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="1ST"></i>
+       <big>FIRST BLOOD</big><abbr>1ST</abbr>
+       <small>BALANCE:</small>
+       <p>0 1ST</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="OMG"></i>
+       <big>OmiseGO</big><abbr>OMG</abbr>
+       <small>BALANCE:</small>
+       <p>0 OMG</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="GNT"></i>
+       <big>GOLEM</big><abbr>GNT</abbr>
+       <small>BALANCE:</small>
+       <p>0 GNT</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="ETH"></i>
+       <big>ETHER</big><abbr>ETH</abbr>
+       <small>BALANCE:</small>
+       <p>0 ETH</p>
+     </li>
+     <!-- END of each token -->
+
+      <!-- Same tokenItem as in the tokenPair screen (minus the <strong> element) -->
+      <li class="tokenItem">
+       <i data-coin="ETH"></i>
+       <big>ETHER</big><abbr>ETH</abbr>
+       <small>BALANCE:</small>
+       <p>0 ETH</p>
+     </li>
+     <!-- END of each token -->
+
+    </ul>
+  </div>
+  <!-- END Token List Overlay -->
+
+  <div class="tokenIntro">
+
+     <h2>Pick Token Pair Auction</h2>
+
+     <div class="tokenPair">
+
+      <!-- Left Positioned Token -->
+       <span class="tokenItem" onclick="modalShow('tokenOverlay')">
+         <strong>SELL</strong>
+         <i data-coin="ETH"></i>
+         <big>ETHER</big><abbr>ETH</abbr>
+         <small>AVAILABLE BALANCE:</small>
+         <p>2.34900345 ETH</p>
+       </span>
+       <!-- END Left Token -->
+
+      <!-- Right Positioned Token -->
+      <span class="tokenItem" onclick="modalShow('tokenOverlay')">
+        <strong>RECEIVE</strong>
+        <i data-coin="GNO"></i>
+        <big>GNOSIS</big><abbr>GNO</abbr>
+        <small>AVAILABLE BALANCE:</small>
+        <!-- Add class `.noBalance` when the balance === 0 -->
+        <p>0.459459434 GNO</p>
+       </span>
+       <!-- END Right Token -->
+
+     </div>
+
+     <!-- CTA Button to proceed to next step -->
+     <a href="#" class="buttonCTA blue">Continue to order details</a>
+     <!-- END CTA Button -->
+
+   </div>
+   <!-- end of .tokenIntro -->
+
+    <div class="topAuctions">
+      <h3>HIGH VOLUME TOKEN PAIR AUCTIONS</h3>
+      <ul>
+        <li><strong>GNO/ETH </strong> 0.03034954</li>
+        <li><strong>GNO/ETH </strong> 0.03034954</li>
+        <li><strong>GNO/ETH </strong> 0.03034954</li>
+        <li><strong>GNO/ETH </strong> 0.03034954</li>
+        <li><strong>GNO/ETH </strong> 0.03034954</li>
+      </ul>
+    </div>
+
+  </div>
+<!-- END of 'tokenPicker' module -->
+
+
+<!-- 'noWallet' module -->
+  <div class="noWallet hide">
+
+  <h2>Enable &amp; unlock your <strong>Mist / Metamask wallet</strong> to connect before continuing.</h2>
+  <span class="icon-walletUnlock"></span>
+  <a href="" class="buttonCTA">
+    Download MetaMask <i class="icon icon-Arrowdown"></i>
+  </a>
+
+</div>
+  <!-- END 'noWallet' module -->
+
+</section>
+<!-- END .home section -->
+
+
+
+
+
+<section class="auction">
+
+
+  <!-- // AMOUNT | auction screen -->
+  <div class="auctionContainer hide" data-screen="amount">
+
+    <!-- Michel Note: Insert the `.tokenOverlay` component here to trigger visibility -->
+
+    <div class="auctionHeader">
+      <h2>Token Auction ETH/GNO</h2>
+      <button class="buttonPrev"></button>
+    </div>
+
+    <!-- // Same tokenPair component -->
+    <div class="tokenPair">
+
+      <!-- Left Positioned Token -->
+       <span class="tokenItem" onclick="modalShow('tokenOverlay')">
+         <i data-coin="ETH"></i>
+         <big>ETHER</big><abbr>ETH</abbr>
+         <small>AVAILABLE BALANCE:</small>
+         <p>2.34900345 ETH</p>
+       </span>
+       <!-- END Left Token -->
+
+      <!-- Right Positioned Token -->
+      <span class="tokenItem" onclick="modalShow('tokenOverlay')">
+        <i data-coin="GNO"></i>
+        <big>GNOSIS</big><abbr>GNO</abbr>
+        <small>AVAILABLE BALANCE:</small>
+        <!-- Add class `.noBalance` when the balance === 0 -->
+        <p>0.459459434 GNO</p>
+       </span>
+       <!-- END Right Token -->
+
+     </div>
+     <!-- // end tokenPair -->
+
+     <div class="auctionLastPrice">
+       <small>Closing price of last auction:</small>
+       <big>1ETH = 2.50000345 GNO</big>
+     </div>
+
+    <div class="auctionAmounts">
+      <span>
+        <label for="sellingAmount">Amount Selling:<a href="#max">MAX</a></label>
+        <!-- Michel Note: Need to allow only numeric values including the `.` entity -->
+        <input type="number" name="sellingAmount" id="sellingAmount" value="0.0000000">
+        <small>ETH</small>
+      </span>
+
+      <span>
+        <label for="gettingAmount">Est. Amount Getting:</label>
+        <!-- // make readonly field -->
+        <input type="number" name="gettingAmount" id="gettingAmount" value="0.0000000" readonly>
+        <small>GNO</small>
+      </span>
+    </div>
+
+    <!-- CTA Button to proceed to next step -->
+    <a href="#" class="buttonCTA blue">Continue to wallet details</a>
+    <!-- END CTA Button -->
+
+  </div>
+  <!-- END of 'AMOUNT' | auction screen -->
+
+
+
+
+
+  <!-- // DETAILS | auction screen -->
+  <div class="auctionContainer hide" data-screen="details">
+
+    <div class="auctionHeader">
+      <h2>Confirm Order Details</h2>
+      <button class="buttonPrev"></button>
+    </div>
+
+    <div class="auctionAmountSummary">
+      <span class="tokenItemSummary">
+        <i data-coin="ETH"></i>
+        <big>SELLING</big>
+        <p>1.00000000 ETH</p>
+       </span>
+
+       <span class="tokenItemSummary">
+        <i data-coin="GNO"></i>
+        <big>BUYING</big>
+        <p>0.459459434 GNO</p>
+       </span>
+    </div>
+
+     <div class="auctionLastPrice">
+       <small>Price of last auction:</small>
+       <big>1ETH = 2.50000345 GNO</big>
+     </div>
+
+     <div class="auctionWalletSummmary">
+        <!-- Michel: Trying to not use extra CSS classes on these span's, but let me know if we should add them for easier JS targetting.
+        Example: For now I assume we can target each span by `document.querySelectorAll('.auctionWalletSummary > span')[0]` and [1] etc. -->
+        <span>
+          <big>Connected Wallet</big>
+          <i data-icon="ok">MetaMask</i>
+          <small>[ETHEREUM MAINNET]</small>
+        </span>
+
+        <span>
+          <big>YOUR WALLET ADDRESS</big>
+          <code>0x912454f8Ebc5hFba4C4f98d625D26329322d5444</code>
+        </span>
+     </div>
+
+     <p>When submitting the order and signing with MetaMask, your deposit will be added to the next (scheduled) auction. Every auction takes aprox. 5 hours.</p>
+
+    <!-- CTA Button to proceed to next step -->
+    <a href="#" class="buttonCTA blue">Submit Order <i class="icon icon-walletOK"></i></a>
+    <!-- END CTA Button -->
+
+  </div>
+  <!-- END of DETAILS | auction screen -->
+
+
+
+
+
+
+
+
+  <!-- // STATUS | auction screen -->
+  <div class="auctionContainer hide" data-screen="status">
+
+    <div class="auctionHeader">
+      <h2>Auction URL: <a href="#">https://www.dutchx.pm/auction/0x03494929349594/</a></h2>
+    </div>
+
+    <div class="auctionStatus">
+      <span>
+        <small>AUCTION</small>
+        <big>ETH/GNO</big>
+      </span>
+
+      <span>
+        <small>STATUS</small>
+<!--         // Available values for `data-status` (it will change text color through CSS):
+        - initialising
+        - planned
+        - active
+        - ended -->
+        <big data-status="initialising">Initialising</big>
+      </span>
+
+
+      <span>
+        <!-- if AUCTION active -->
+        <h5>ESTIMATED COMPLETION TIME</h5>
+        <i>20h 23m 34s</i>
+        <!-- END if AUCTION active -->
+
+        <!-- if AUCTION ended -->
+        <!-- Set the button text with the amount of tokens to be claimed -->
+        <button id="claimToken">
+          <i>CLAIM</i>
+          <strong>2.5520300 GNO</strong>
+          <span><img src="images/claim.svg"></span>
+        </button>
+        <!-- END if AUCTION ended -->
+      </span>
+
+    </div>
+<!-- add amount tokens cladiming in button -->
+    <div class="auctionProgress">
+
+      <div class="progress-bar" data-progress="2"></div>
+
+      <span>
+        <!-- Add class `.active` to <i> whenever that step is active/actual -->
+          <!-- add data attribute `data-icon="ok"` if step is done. -->
+        <i class="active" data-icon="ok"><img src="images/arrowDownStep.svg"><small>DEPOSIT CONFIRMED</small></i>
+        <i class="active" data-icon="ok"><img src="images/auctionStep.svg"><small>AUCTION STARTED</small></i>
+        <i><img src="images/walletStep.svg"><small>CLAIM TOKENS TO YOUR WALLET</small></i>
+      </span>
+    </div>
+
+    <div class="auctionFooter">
+      <span>
+        <small>AMOUNT SELLING</small>
+        <big>1.00000000 ETH</big>
+      </span>
+      <span>
+        <!-- // remove the word 'ESTIMATED' when auction ends -->
+        <small>ESTIMATED GETTING TOTAL</small>
+        <big>2.5520300 GNO</big>
+      </span>
+    </div>
+
+
+  </div>
+  <!-- END of STATUS | auction screen -->
+
+
+
+
+
+<!-- steps:1 deposit confirmed
+steps:2 auction started
+steps:3  -->
+
+
+</section>
+
+
+
+
+
+
+
+
+
+
+</body>
+
+<script type="text/javascript" src="/js/global.js"></script>
+
+</html>
