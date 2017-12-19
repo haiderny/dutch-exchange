@@ -12,7 +12,7 @@ contract StandardToken is Token {
      */
     mapping (address => uint) balances;
     mapping (address => mapping (address => uint)) allowances;
-    uint totalTokens;
+    uint public totalTokens;
 
     /*
      *  Public functions
