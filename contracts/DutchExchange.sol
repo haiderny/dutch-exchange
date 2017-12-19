@@ -60,8 +60,7 @@ contract DutchExchange {
     mapping (address => mapping (address => uint)) public balances;
 
     // Token => Token => auctionIndex => amount
-    mapping (address => mapping (address => mapping (uint => uint))) public extraSellTokens;
-    mapping (address => mapping (address => mapping (uint => uint))) public extraBuyTokens;
+    mapping (address => mapping (address => mapping (uint => uint))) public extraTokens;
 
     // Token => Token =>  auctionIndex => user => amount
     mapping (address => mapping (address => mapping (uint => mapping (address => uint)))) public sellerBalances;
@@ -209,6 +208,7 @@ contract DutchExchange {
         uint fundedValueUSD;
         uint ETHUSDPrice = PriceOracleInterface(ETHUSDOracle).getUSDETHPrice();
 
+        // Compute fundedValueUSD
         if (token1 == ETH) {
             fundedValueUSD = token1Funding * ETHUSDPrice;
         } else if (token2 == ETH) {
@@ -231,21 +231,41 @@ contract DutchExchange {
         }
 
         require(fundedValueUSD >= thresholdNewTokenPair);
-        
-        balances[token1][msg.sender] -= token1Funding;
-        balances[token2][msg.sender] -= token2Funding;
 
         // Save prices of opposite auctions
         closingPrices[token1][token2][0] = fraction(initialClosingPriceNum, initialClosingPriceDen);
         closingPrices[token2][token1][0] = fraction(initialClosingPriceDen, initialClosingPriceNum);
+        
+        addTokenPair2(token1, token2, token1Funding, token2Funding);
+    }
+
+    function addTokenPair2 (
+        address token1,
+        address token2,
+        uint token1Funding,
+        uint token2Funding
+    )
+        internal
+    {
+        balances[token1][msg.sender] -= token1Funding;
+        balances[token2][msg.sender] -= token2Funding;
+
+        // Fee mechanism, fees are added to extraTokens
+        uint feeToken1 = settleFee(token1, msg.sender, token1Funding);
+        uint feeToken2 = settleFee(token2, msg.sender, token2Funding);
+        extraTokens[token1][token2][1] = feeToken1;
+        extraTokens[token2][token1][1] = feeToken2;
+
+        uint token1FundingAfterFee = token1Funding - feeToken1;
+        uint token2FundingAfterFee = token2Funding - feeToken2;
 
         // Update other variables
-        sellVolumesCurrent[token1][token2] = token1Funding;
-        sellVolumesCurrent[token2][token1] = token2Funding;
-        sellerBalances[token1][token2][0][msg.sender] = token1Funding;
-        sellerBalances[token2][token1][0][msg.sender] = token2Funding;
+        sellVolumesCurrent[token1][token2] = token1FundingAfterFee;
+        sellVolumesCurrent[token2][token1] = token2FundingAfterFee;
+        sellerBalances[token1][token2][0][msg.sender] = token1FundingAfterFee;
+        sellerBalances[token2][token1][0][msg.sender] = token2FundingAfterFee;
         
-        setAuctionStart(token1, token2);
+        setAuctionStart(token1, token2, 6 hours);
         NewTokenPair(token1, token2);
     }
     
@@ -299,10 +319,10 @@ contract DutchExchange {
             require(auctionIndex == latestAuctionIndex + 1);
         }
 
-        // Fee mechanism, fees are added to extraSellTokens
+        // Fee mechanism, fees are added to extraTokens
         uint fee = settleFee(sellToken, msg.sender, amount);
         // Fees are added not to next starting auction, but to the auction after that
-        extraSellTokens[sellToken][buyToken][auctionIndex + 1] += fee;
+        extraTokens[sellToken][buyToken][auctionIndex + 1] += fee;
 
         uint amountAfterFee = amount - fee;
 
@@ -346,10 +366,9 @@ contract DutchExchange {
         amount = Math.min(amount, balances[buyToken][msg.sender]);
 
         // Fee mechanism
-        //ToDo no amountOfOWLBurn 
         uint fee = settleFee(buyToken, msg.sender, amount);
         // Fees are always added to next auction
-        extraBuyTokens[sellToken][buyToken][auctionIndex + 1] += fee;
+        extraTokens[buyToken][sellToken][auctionIndex + 1] += fee;
         uint amountAfterFee = amount - fee;
         
         // Overbuy is when a part of a buy order clears an auction
@@ -474,26 +493,23 @@ contract DutchExchange {
         returned = sellerBalance * num / den;
 
         // Get tulips issued based on ETH price of returned tokens
-        if (sellToken == ETH) {
-            tulipsIssued = sellerBalance;
-        } else if (buyToken == ETH) {
-            tulipsIssued = returned;
-        } else {
-            // Neither token is ETH, so we use priceOracle()
-            // priceOracle() depends on latestAuctionIndex
-            // i.e. if a user claims tokens later in the future,
-            // he/she is likely to get slightly different number
-            fraction memory price = priceOracle(buyToken);
-            tulipsIssued = sellerBalance * price.num / price.den;
+        if (approvedTokens[sellToken] == true && approvedTokens[buyToken] == true) {
+            if (sellToken == ETH) {
+                tulipsIssued = sellerBalance;
+            } else if (buyToken == ETH) {
+                tulipsIssued = returned;
+            } else {
+                // Neither token is ETH, so we use priceOracle()
+                // priceOracle() depends on latestAuctionIndex
+                // i.e. if a user claims tokens later in the future,
+                // he/she is likely to get slightly different number
+                fraction memory price = priceOracle(buyToken);
+                tulipsIssued = sellerBalance * price.num / price.den;
+            }
+
+            // Issue TUL
+            TokenTUL(TUL).mintTokens(user, tulipsIssued);
         }
-
-        // Issue TUL
-        TokenTUL(TUL).mintTokens(user, tulipsIssued);
-
-        // Add extra buy tokens
-        uint extraTokensTotal = extraBuyTokens[sellToken][buyToken][auctionIndex];
-        uint extraTokens = sellerBalance * extraTokensTotal / den;
-        returned += extraTokens;
 
         // Claim tokens
         sellerBalances[sellToken][buyToken][auctionIndex][user] = 0;
@@ -527,14 +543,16 @@ contract DutchExchange {
 
             // Assign extra sell tokens (this is possible only after auction has cleared,
             // because buyVolume could still increase before that)
-            uint extraTokensTotal = extraSellTokens[sellToken][buyToken][auctionIndex];
+            uint extraTokensTotal = extraTokens[sellToken][buyToken][auctionIndex];
             uint buyerBalance = buyerBalances[sellToken][buyToken][auctionIndex][user];
-            uint extraTokens = buyerBalance * extraTokensTotal / buyVolumes[sellToken][buyToken];
-            returned += extraTokens;
+            uint tokensExtra = buyerBalance * extraTokensTotal / buyVolumes[sellToken][buyToken];
+            returned += tokensExtra;
         }
 
-        // Issue TUL
-        TokenTUL(TUL).mintTokens(user, tulipsIssued);
+        if (tulipsToIssue > 0) {
+            // Issue TUL
+            TokenTUL(TUL).mintTokens(user, tulipsIssued);
+        }
 
         // Claim tokens
         balances[sellToken][user] += returned;
@@ -567,18 +585,20 @@ contract DutchExchange {
             unclaimedBuyerFunds = buyerBalance * price.den / price.num - claimedAmounts[sellToken][buyToken][auctionIndex][user];
         }
 
-        // Get tulips issued based on ETH price of returned tokens
-        if (buyToken == ETH) {
-            tulipsToIssue = unclaimedBuyerFunds * price.num / price.den;
-        } else if (sellToken == ETH) {
-            tulipsToIssue = unclaimedBuyerFunds;
-        } else {
-            // Neither token is ETH, so we use priceOracle()
-            // priceOracle() depends on latestAuctionIndex
-            // i.e. if a user claims tokens later in the future,
-            // he/she is likely to get slightly different number
-            fraction memory priceETH = priceOracle(sellToken);
-            tulipsToIssue = unclaimedBuyerFunds * priceETH.num / priceETH.den;
+        if (approvedTokens[buyToken] == true && approvedTokens[sellToken] == true) {
+            // Get tulips issued based on ETH price of returned tokens
+            if (buyToken == ETH) {
+                tulipsToIssue = unclaimedBuyerFunds * price.num / price.den;
+            } else if (sellToken == ETH) {
+                tulipsToIssue = unclaimedBuyerFunds;
+            } else {
+                // Neither token is ETH, so we use priceOracle()
+                // priceOracle() depends on latestAuctionIndex
+                // i.e. if a user claims tokens later in the future,
+                // he/she is likely to get slightly different number
+                fraction memory priceETH = priceOracle(sellToken);
+                tulipsToIssue = unclaimedBuyerFunds * priceETH.num / priceETH.den;
+            }
         }
     }
 
@@ -648,7 +668,7 @@ contract DutchExchange {
                 // Hence clearing price != 0
                 // So dividing by clearingPriceNum doesn't break
                 uint extraFromArb2 = (buyVolume - arbitrationTokensAdded) * sellVolume / buyVolume;
-                extraSellTokens[sellToken][buyToken][auctionIndex] += extraFromArb1 - opp.num - extraFromArb2;
+                extraTokens[sellToken][buyToken][auctionIndex] += extraFromArb1 - opp.num - extraFromArb2;
             }
 
             // In any case increment auction index and check if next auction can be scheduled
@@ -711,7 +731,7 @@ contract DutchExchange {
         uint sellVolumeNextOpp = sellVolumesNext[buyToken][sellToken] * ETHUSDPrice;
         if (sellVolumeNext >= thresholdNewAuction || sellVolumeNextOpp >= thresholdNewAuction) {
             // Schedule next auction
-            setAuctionStart(sellToken, buyToken);
+            setAuctionStart(sellToken, buyToken, 10 minutes);
         }
     }
 
@@ -762,12 +782,13 @@ contract DutchExchange {
 
     function setAuctionStart(
         address token1,
-        address token2
+        address token2,
+        uint value
     )
         internal
     {
         (token1, token2) = getTokenOrder(token1, token2);
-        auctionStarts[token1][token2] = now + 10 minutes;
+        auctionStarts[token1][token2] = now + value;
     }
 
     function getAuctionStart(
