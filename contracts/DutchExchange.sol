@@ -28,7 +28,6 @@ contract DutchExchange {
     uint public thresholdNewAuction;
     address public TUL;
     address public OWL;
-    address public priceOracleAddress;
 
     // Token => approved
     // Only tokens approved by owner generate TUL tokens
@@ -321,7 +320,6 @@ contract DutchExchange {
 
         // Fee mechanism, fees are added to extraTokens
         uint fee = settleFee(sellToken, msg.sender, amount);
-        // Fees are added not to next starting auction, but to the auction after that
         extraTokens[sellToken][buyToken][auctionIndex + 1] += fee;
 
         uint amountAfterFee = amount - fee;
@@ -384,6 +382,7 @@ contract DutchExchange {
             // We must process the buy order
             if (overbuy > 0) {
                 // We have to adjust the amountAfterFee
+                amount -= uint(overbuy);
                 amountAfterFee -= uint(overbuy);
             }
 
@@ -397,7 +396,9 @@ contract DutchExchange {
         if (overbuy >= 0) {
             // Clear auction
             clearAuction(sellToken, buyToken, auctionIndex, sellVolume);
-        } else if (now >= getAuctionStart(sellToken, buyToken) + 6 hours) {
+        }
+
+        if (now >= getAuctionStart(sellToken, buyToken) + 6 hours) {
             // Prices have crossed
             // We need to clear current or opposite auction
             closeCurrentOrOppositeAuction(
@@ -405,9 +406,7 @@ contract DutchExchange {
                 buyToken,
                 auctionIndex,
                 uint(-1 * overbuy),
-                sellVolume,
-                price.num,
-                price.den
+                sellVolume
             );
         }
     }
@@ -417,31 +416,36 @@ contract DutchExchange {
         address buyToken,
         uint auctionIndex,
         uint outstandingVolume,
-        uint sellVolume,
-        uint currentAuctionNum,
-        uint currentAuctionDen
+        uint sellVolume
     )
         internal
     {
         // Get variables
         uint sellVolumeOpp = sellVolumesCurrent[buyToken][sellToken];
         uint buyVolumeOpp = buyVolumes[buyToken][sellToken];
-        uint outstandingVolumeOpp = sellVolumeOpp - buyVolumeOpp * currentAuctionNum / currentAuctionDen;
+        // We have to compute the price at intersection time,
+        // which will be exactly half of initial price
+        fraction memory sellTokenPrice = priceOracle(sellToken);
+        fraction memory buyTokenPrice = priceOracle(buyToken);
+        fraction memory price;
+        price.num = sellTokenPrice.num * buyTokenPrice.den;
+        price.den =  sellTokenPrice.den * buyTokenPrice.num;
+        uint outstandingVolumeOpp = sellVolumeOpp - buyVolumeOpp *  price.num / price.den;
 
         if (outstandingVolume <= outstandingVolumeOpp) {            
             // Increment buy volume of current & opposite auctions
             buyVolumes[sellToken][buyToken] += outstandingVolume;
-            buyVolumes[buyToken][sellToken] += outstandingVolume * currentAuctionDen / currentAuctionNum;
+            buyVolumes[buyToken][sellToken] += outstandingVolume * price.den / price.num;
 
             // Record number of tokens added
-            setArbTokens(sellToken, buyToken, outstandingVolume * currentAuctionDen / currentAuctionNum);
+            setArbTokens(sellToken, buyToken, outstandingVolume * price.den / price.num);
 
             // Close current auction
             clearAuction(sellToken, buyToken, auctionIndex, sellVolume);
         } else {
             // Increment buy volume of current & opposite auctions 
             buyVolumes[sellToken][buyToken] += outstandingVolumeOpp;
-            buyVolumes[buyToken][sellToken] += outstandingVolumeOpp * currentAuctionDen / currentAuctionNum;
+            buyVolumes[buyToken][sellToken] += outstandingVolumeOpp * price.den / price.num;
 
             // Record number of tokens added
             setArbTokens(sellToken, buyToken, outstandingVolumeOpp);
@@ -669,6 +673,7 @@ contract DutchExchange {
                 // So dividing by clearingPriceNum doesn't break
                 uint extraFromArb2 = (buyVolume - arbitrationTokensAdded) * sellVolume / buyVolume;
                 extraTokens[sellToken][buyToken][auctionIndex] += extraFromArb1 - opp.num - extraFromArb2;
+                resetArbTokens(sellToken, buyToken);
             }
 
             // In any case increment auction index and check if next auction can be scheduled
