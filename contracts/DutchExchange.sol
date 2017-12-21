@@ -304,8 +304,10 @@ contract DutchExchange {
         amount = Math.min(amount, balances[sellToken][msg.sender]);
         // R1: amount mmust be > 0
         require(amount > 0);
-        uint latestAuctionIndex = getAuctionIndex(sellToken, buyToken);
+        
         uint auctionStart = getAuctionStart(sellToken, buyToken);
+        uint latestAuctionIndex = getAuctionIndex(sellToken, buyToken);
+        require(latestAuctionIndex > 0);
 
         if (now < auctionStart) {
             // C1: We are in the 10 minute buffer period
@@ -357,8 +359,10 @@ contract DutchExchange {
         // R1
         require(getAuctionStart(sellToken, buyToken) <= now);
         // R2
+        require(auctionIndex > 0);
+        // R3
         require(auctionIndex == getAuctionIndex(sellToken, buyToken));
-        // R3: auction must not have cleared
+        // R4: auction must not have cleared
         require(closingPrices[sellToken][buyToken][auctionIndex].den == 0);
 
         amount = Math.min(amount, balances[buyToken][msg.sender]);
@@ -755,6 +759,9 @@ contract DutchExchange {
         } else {
             // Get variables
             uint auctionIndex = getAuctionIndex(token, ETH);
+
+            // R1
+            require(auctionIndex > 0);
             fraction memory closingPriceETH = closingPrices[ETH][token][auctionIndex - 1];
             fraction memory closingPriceToken = closingPrices[token][ETH][auctionIndex - 1];
 
@@ -777,9 +784,6 @@ contract DutchExchange {
         if (token2 < token1) {
             (token1, token2) = (token2, token1);
         }
-        
-        // R1
-        require(latestAuctionIndices[token1][token2] > 0);
 
         return (token1, token2);
     }
