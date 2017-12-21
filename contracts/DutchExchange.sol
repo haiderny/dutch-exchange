@@ -362,15 +362,9 @@ contract DutchExchange {
         require(closingPrices[sellToken][buyToken][auctionIndex].den == 0);
 
         amount = Math.min(amount, balances[buyToken][msg.sender]);
-
-        // Fee mechanism
-        uint fee = settleFee(buyToken, msg.sender, amount);
-        // Fees are always added to next auction
-        extraTokens[buyToken][sellToken][auctionIndex + 1] += fee;
-        uint amountAfterFee = amount - fee;
         
         // Overbuy is when a part of a buy order clears an auction
-        // In that case we only priceOracleAddress the part before the overbuy
+        // In that case we only process the part before the overbuy
         // To calculate overbuy, we first get current price
         fraction memory price = getPrice(sellToken, buyToken, auctionIndex);
 
@@ -383,8 +377,13 @@ contract DutchExchange {
             if (overbuy > 0) {
                 // We have to adjust the amountAfterFee
                 amount -= uint(overbuy);
-                amountAfterFee -= uint(overbuy);
             }
+
+            // Fee mechanism
+            uint fee = settleFee(buyToken, msg.sender, amount);
+            // Fees are always added to next auction
+            extraTokens[buyToken][sellToken][auctionIndex + 1] += fee;
+            uint amountAfterFee = amount - fee;
 
             // Update variables
             balances[buyToken][msg.sender] -= amount;
