@@ -374,7 +374,7 @@ contract DutchExchange {
 
         uint sellVolume = sellVolumesCurrent[sellToken][buyToken];
         uint buyVolume = buyVolumes[sellToken][buyToken];
-        int overbuy = int(buyVolume + amountAfterFee - sellVolume * price.num / price.den);
+        int overbuy = int(buyVolume + amount - sellVolume * price.num / price.den);
 
         if (int(amountAfterFee) > overbuy) {
             // We must process the buy order
