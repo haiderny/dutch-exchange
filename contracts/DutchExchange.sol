@@ -373,10 +373,10 @@ contract DutchExchange {
         fraction memory price = getPrice(sellToken, buyToken, auctionIndex);
 
         uint sellVolume = sellVolumesCurrent[sellToken][buyToken];
-        uint buyVolume = buyVolumes[sellToken][buyToken];
-        int overbuy = int(buyVolume + amount - sellVolume * price.num / price.den);
+        uint buyVolume = buyVolumes[amount][buyToken];
+        int overbuy = int(buyVolume + amountAfterFee - sellVolume * price.num / price.den);
 
-        if (int(amountAfterFee) > overbuy) {
+        if (int(amount) > overbuy) {
             // We must process the buy order
             if (overbuy > 0) {
                 // We have to adjust the amountAfterFee
