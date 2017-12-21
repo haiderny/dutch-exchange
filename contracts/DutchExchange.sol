@@ -373,13 +373,13 @@ contract DutchExchange {
         fraction memory price = getPrice(sellToken, buyToken, auctionIndex);
 
         uint sellVolume = sellVolumesCurrent[sellToken][buyToken];
-        uint buyVolume = buyVolumes[amount][buyToken];
-        int overbuy = int(buyVolume + amountAfterFee - sellVolume * price.num / price.den);
+        uint buyVolume = buyVolumes[sellToken][buyToken];
+        int overbuy = int(buyVolume + amount - sellVolume * price.num / price.den);
 
         if (int(amount) > overbuy) {
             // We must process the buy order
             if (overbuy > 0) {
-                // We have to adjust the amountAfterFee
+                // We have to adjust the amount
                 amount -= uint(overbuy);
             }
 
@@ -765,11 +765,18 @@ contract DutchExchange {
             fraction memory closingPriceETH = closingPrices[ETH][token][auctionIndex - 1];
             fraction memory closingPriceToken = closingPrices[token][ETH][auctionIndex - 1];
 
-            // Compute weighted average
-            uint numFirstPart = closingPriceETH.den ** 2 * closingPriceToken.den;
-            uint numSecondPart = closingPriceToken.num ** 2 * closingPriceETH.num;
-            price.num = numFirstPart + numSecondPart;
-            price.den = closingPriceETH.num * closingPriceToken.den * (closingPriceETH.den + closingPriceToken.num);
+            if (closingPriceETH.num == 0) {
+                // Happens when 0 tokens were received as buy volume for ETH-token auction
+                // While this makes the token price ∞, for our purposes we ignore that auction
+                price.num = closingPriceToken.num;
+                // This represents the sell volume of token-ETH
+                // Due to thresholdNewAuction, it will never be 0
+                price.den = closingPriceToken.den;
+            } else {
+                // Compute weighted average
+                price.num = closingPriceETH.den ** 2 * closingPriceToken.den + closingPriceToken.num ** 2 * closingPriceETH.num;
+                price.den = closingPriceETH.num * closingPriceToken.den * (closingPriceETH.den + closingPriceToken.num);
+            }
         }
     }
 
